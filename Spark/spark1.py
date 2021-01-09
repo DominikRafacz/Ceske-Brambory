@@ -55,12 +55,26 @@ def put_in_hbase(events):
         with open('/file.txt', 'a') as myfile:
             myfile.write(str(event) + "\n")
         event_id = event['event_id']
-        row = [(event_id, [event_id, 'r', 'collected', already_collected(event_id) + len(event['data'])]),
-               (event_id, [event_id, 'r', 'total', event['total_messages']])]
-        row.extend(
-            [(event_id, [event_id, 'h', str(i), val]) for (i, val) in [(hit['hit_id'], hit) for hit in event['data']]]
-        )
-        sparkContext.parallelize(row).saveAsNewAPIHadoopDataset(hbase_conf, key_conv, value_conv)
+        already_collected = already_collected(event_id)
+        if already_collected==0:
+            Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:total_messages', 'PUT', 
+                                    body=event["total_messages"], headers={'content-type':'text/plain'})
+        Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:collected', 'PUT', 
+                                    body=str(already_collected + len(event['data'])), headers={'content-type':'text/plain'})
+        for hit in event['data']:
+            Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:collected', 'PUT', 
+                                    body=hit, headers={'content-type':'text/json'})
+        # row = [(event_id, [event_id, 'r', 'collected', already_collected + len(event['data'])]),
+        #        (event_id, [event_id, 'r', 'total', event['total_messages']])]
+        # row.extend(
+            # [(event_id, [event_id, 'h', str(i), val]) for (i, val) in [(hit['hit_id'], hit) for hit in event['data']]]
+        # )
+
+        
+        
+
+        # status = response[0]['status']
+        # sparkContext.parallelize(row).saveAsNewAPIHadoopDataset(hbase_conf, key_conv, value_conv)
 
     # sqlContext.createDataFrame(Row(row_and_schema[0]), row_and_schema[1]) \
     #     .write\
