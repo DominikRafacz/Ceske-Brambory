@@ -1,5 +1,5 @@
 #!/bin/bash
-FILE=/user/brambory/hive/setup.hql
+FILE=/home/brambory/hive/setup.hql
 if [ -f "$FILE" ]; then
     echo "$FILE found. Setting up hive table"
     hive -S -f $FILE

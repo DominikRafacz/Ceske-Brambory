@@ -21,29 +21,25 @@ def put_in_hbase(events):
         return
     events = events.collect()
     for event in events:
-        with open('/file.txt', 'a') as myfile:
-            event_id = event['event_id']
-            myfile.write(str(event_id) + "\n")
-            ac = already_collected(event_id)
-            if ac == 0:
-                response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:total_messages', 'PUT',
-                               body=str(event["total_messages"]), headers={'content-type': 'application/octet-stream'})
-                myfile.write(response[0]['status'] + "\n")
-            new_ac = ac + len(event['data'])
-            response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:collected', 'PUT',
-                           body=str(new_ac), headers={'content-type': 'application/octet-stream'})
-            myfile.write(response[0]['status'] + "\n")
-            for hit in event['data']:
-                response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/h:' + str(hit['hit_id']), 'PUT',
-                               body=str(hit), headers={'content-type': 'application/octet-stream'})
-                myfile.write(response[0]['status'] + "\n")
+        event_id = event['event_id']
+        response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:total_hits', 'PUT',
+                           body=str(event["total_hits"]), headers={'content-type': 'application/octet-stream'})
+        for hit in event['data']:
+            response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/h:' + str(hit['hit_id']), 'PUT',
+                           body=str(hit), headers={'content-type': 'application/octet-stream'})
+        ac = already_collected(event_id)
+        new_ac = ac + len(event['data'])
+        response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:collected', 'PUT',
+                       body=str(new_ac), headers={'content-type': 'application/octet-stream'})
+        if new_ac == event['total_hits']:
 
-            if new_ac == event['total_messages']:
-                send_completion_msg_to_kafka_topic(event_id)
+            with open("/file.txt", "a") as f:
+                f.write("siemaaaa " + str(event_id))
+            send_completion_msg_to_kafka_topic(event_id)
 
 
 sparkContext = SparkContext.getOrCreate()
-streamingContext = StreamingContext(sparkContext, 1)
+streamingContext = StreamingContext(sparkContext, 5)
 sqlContext = SQLContext(sparkContext)
 
 
