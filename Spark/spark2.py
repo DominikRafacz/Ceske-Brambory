@@ -37,7 +37,7 @@ hiveContext = HiveContext(sparkContext)
 
 kafkaStream = KafkaUtils.createStream(streamingContext, 'sandbox.hortonworks.com:2181', 'defaultGroup', {'successes': 1})
 kafkaStream \
-    .map(lambda x: x[1].encode("utf-8")) \
+    .map(lambda x: x[0].encode("utf-8")) \
     .foreachRDD(lambda x: populate_hive_table(x, hiveContext))
 
 
