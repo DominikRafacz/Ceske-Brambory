@@ -4,6 +4,9 @@ from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 from httplib2 import Http
 import json
+from kafka import KafkaProducer
+
+producer = KafkaProducer(bootstrap_servers='sandbox.hortonworks.com:6667')
 
 
 def get_collected(event_id):
@@ -37,8 +40,8 @@ def put_collected(event_id, collected):
                        body=str(collected), headers={'content-type': 'application/octet-stream'})
 
 def send_completion_msg_to_kafka_topic(event_id):
-    with open("/file.txt", "w") as f:
-                f.write("nie wysłałem " + str(event_id) + " bo jest corrupted")
+    producer.send('successes', str(event_id))
+    producer.flush()
 
 def verify_hit(hit):
     corrupted_columns = []
