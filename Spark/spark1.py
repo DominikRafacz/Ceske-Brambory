@@ -4,9 +4,10 @@ from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 from httplib2 import Http
 import json
-from kafka import KafkaProducer
+from kafka import SimpleClient, SimpleProducer
 
-producer = KafkaProducer(bootstrap_servers='sandbox.hortonworks.com:6667')
+kafkaClient = SimpleClient('sandbox.hortonworks.com:6667')
+producer = SimpleProducer(kafkaClient)
 
 
 def get_collected(event_id):
