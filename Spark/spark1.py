@@ -41,8 +41,7 @@ def put_collected(event_id, collected):
                        body=str(collected), headers={'content-type': 'application/octet-stream'})
 
 def send_completion_msg_to_kafka_topic(event_id):
-    producer.send('successes', str(event_id))
-    producer.flush()
+    producer.send_messages(b'successes', str(event_id))
 
 def verify_hit(hit):
     corrupted_columns = []
