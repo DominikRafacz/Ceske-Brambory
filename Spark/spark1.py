@@ -4,10 +4,6 @@ from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 from httplib2 import Http
 import json
-from kafka import SimpleClient, SimpleProducer
-
-kafkaClient = SimpleClient('sandbox.hortonworks.com:6667')
-producer = SimpleProducer(kafkaClient)
 
 
 def get_collected(event_id):
@@ -41,7 +37,8 @@ def put_collected(event_id, collected):
                            body=str(collected), headers={'content-type': 'application/octet-stream'})
 
 def send_completion_msg_to_kafka_topic(event_id):
-    Http().request("sandbox.hortonworks.com:50070/webhdfs/v1/user/brambory/kafka-mock/"+ str(event_id) + "?user.name=nifi&op=CREATE", 'PUT')
+    with open("/home/brambory/kafka-mock/" + str(event_id), "w") as f:
+        f.write(str(event_id))
 
 def verify_hit(hit):
     corrupted_columns = []
