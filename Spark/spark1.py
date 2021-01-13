@@ -38,10 +38,10 @@ def put_hit(event_id, hit_id, hit):
 
 def put_collected(event_id, collected):
     return Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:collected', 'PUT',
-                       body=str(collected), headers={'content-type': 'application/octet-stream'})
+                           body=str(collected), headers={'content-type': 'application/octet-stream'})
 
 def send_completion_msg_to_kafka_topic(event_id):
-    producer.send_messages(b'successes', str(event_id))
+    Http().request("sandbox.hortonworks.com:50070/webhdfs/v1/user/brambory/kafka-mock/"+ str(event_id)"?user.name=hdfs&op=CREATE")
 
 def verify_hit(hit):
     corrupted_columns = []
