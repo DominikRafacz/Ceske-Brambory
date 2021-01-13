@@ -41,7 +41,7 @@ def put_collected(event_id, collected):
                            body=str(collected), headers={'content-type': 'application/octet-stream'})
 
 def send_completion_msg_to_kafka_topic(event_id):
-    Http().request("sandbox.hortonworks.com:50070/webhdfs/v1/user/brambory/kafka-mock/"+ str(event_id)"?user.name=hdfs&op=CREATE")
+    Http().request("sandbox.hortonworks.com:50070/webhdfs/v1/user/brambory/kafka-mock/"+ str(event_id) + "?user.name=hdfs&op=CREATE")
 
 def verify_hit(hit):
     corrupted_columns = []
