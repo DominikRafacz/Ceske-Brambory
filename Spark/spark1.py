@@ -7,12 +7,14 @@ import json
 
 
 def get_collected(event_id):
-    response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:collected', 'GET')
+    response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/r:collected', 'GET',
+                              headers={'Accept': 'application/octet-stream'})
     status = response[0]['status']
     return int(response[1]) if status == '200' else 0
 
 def get_corrupted_count(event_id):
-    response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/c:count', 'GET')
+    response = Http().request('http://sandbox.hortonworks.com:8000/events/' + str(event_id) + '/c:count', 'GET',
+                              headers={'Accept': 'application/octet-stream'})
     status = response[0]['status']
     return int(response[1]) if status == '200' else 0
 
@@ -37,7 +39,7 @@ def put_collected(event_id, collected):
                            body=str(collected), headers={'content-type': 'application/octet-stream'})
 
 def send_completion_msg_to_kafka_topic(event_id):
-    with open("/home/brambory/kafka-mock/" + str(event_id), "w") as f:
+    with open("/kafka-mock/" + str(event_id), "w") as f:
         f.write(str(event_id))
 
 def verify_hit(hit):
